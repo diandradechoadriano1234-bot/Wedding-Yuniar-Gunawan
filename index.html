@@ -658,7 +658,7 @@ function fadeOut(music){
   fadeInterval = setInterval(()=>{
     if(music.volume > 0.01){
       // penurunan super kecil (natural banget)
-      music.volume *= 0.95;
+      music.volume *= 0.55;
     } else {
       music.volume = 0;
       music.pause();
