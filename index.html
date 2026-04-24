@@ -635,42 +635,60 @@ reveals.forEach(el => observerScroll.observe(el));
 
 <script>
 let isPlaying = false;
+let fadeInterval = null;
 
+/* FADE IN */
+function fadeIn(music){
+  clearInterval(fadeInterval);
+  music.volume = 0;
+
+  fadeInterval = setInterval(()=>{
+    if(music.volume < 0.6){
+      music.volume += 0.02;
+    } else {
+      clearInterval(fadeInterval);
+    }
+  },100);
+}
+
+/* FADE OUT */
+function fadeOut(music){
+  clearInterval(fadeInterval);
+
+  fadeInterval = setInterval(()=>{
+    if(music.volume > 0.05){
+      music.volume -= 0.02;
+    } else {
+      music.volume = 0;
+      music.pause();
+      clearInterval(fadeInterval);
+    }
+  },100);
+}
+
+/* OPEN INVITATION */
 function openInvitation(){
   const cover = document.getElementById("cover");
   const content = document.getElementById("mainContent");
   const music = document.getElementById("bgMusic");
   const control = document.getElementById("musicControl");
 
-  // tampilkan tombol musik
   control.classList.remove("hidden");
 
-  // PLAY MUSIC + FADE IN
   if(music){
-    music.volume = 0;
     music.play().then(()=>{
       isPlaying = true;
+      fadeIn(music);
     }).catch(()=>{});
-
-    let vol = 0;
-    const fade = setInterval(()=>{
-      if(vol < 0.6){
-        vol += 0.05;
-        music.volume = vol;
-      } else {
-        clearInterval(fade);
-      }
-    },200);
   }
 
-  // animasi
   cover.style.opacity="0";
   content.classList.remove("translate-y-full");
 
   setTimeout(()=>{cover.style.display="none";},1000);
 }
 
-/* TOGGLE MUSIC */
+/* TOGGLE BUTTON */
 function toggleMusic(){
   const music = document.getElementById("bgMusic");
   const icon = document.getElementById("musicIcon");
@@ -678,31 +696,37 @@ function toggleMusic(){
   if(!music) return;
 
   if(isPlaying){
-    music.pause();
+    fadeOut(music);
     icon.classList.add("pause-spin");
     isPlaying = false;
   } else {
-    music.play();
+    music.play().then(()=>{
+      fadeIn(music);
+    });
     icon.classList.remove("pause-spin");
     isPlaying = true;
   }
 }
 
-/* AUTO PAUSE KALAU PINDAH TAB */
+/* PINDAH TAB */
 document.addEventListener("visibilitychange", function(){
   const music = document.getElementById("bgMusic");
   const icon = document.getElementById("musicIcon");
 
+  if(!music) return;
+
   if(document.hidden){
-    music.pause();
+    // fade out saat keluar
+    fadeOut(music);
     icon.classList.add("pause-spin");
     isPlaying = false;
   } else {
-    if(music){
-      music.play().catch(()=>{});
+    // auto lanjut + fade in saat balik
+    music.play().then(()=>{
+      fadeIn(music);
       icon.classList.remove("pause-spin");
       isPlaying = true;
-    }
+    }).catch(()=>{});
   }
 });
 </script>
