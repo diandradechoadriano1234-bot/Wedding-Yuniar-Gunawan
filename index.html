@@ -656,14 +656,15 @@ function fadeOut(music){
   clearInterval(fadeInterval);
 
   fadeInterval = setInterval(()=>{
-    if(music.volume > 0.05){
-      music.volume -= 0.02;
+    if(music.volume > 0.01){
+      // penurunan super kecil (natural banget)
+      music.volume *= 0.95;
     } else {
       music.volume = 0;
       music.pause();
       clearInterval(fadeInterval);
     }
-  },100);
+  },150); // interval lebih santai
 }
 
 /* OPEN INVITATION */
